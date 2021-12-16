@@ -2,6 +2,8 @@ import numpy
 import matplotlib.pyplot as plt
 import itertools
 import math
+from sklearn.cluster import DBSCAN
+from sklearn.datasets import make_classification
 
 
 def get_data_from_file(filepath):
@@ -18,7 +20,7 @@ def get_points_coordinates(array, step: int = 1):
     height = array.shape[0]
     for v, h in itertools.product(range(0, height, step), range(0, width, step)):
         x.append(h)
-        z.append(height - v)
+        z.append(height - v - 1)
         y.append(array[v, h])
     return x, y, z
 
@@ -51,12 +53,35 @@ def show_2d_plot(array):
     plt.show()
 
 
-def show_3d_plot(array, scatter: int = 1):
-    px, py, pz = get_points_coordinates(array, step=scatter)
-    # px, py, pz = get_points_in_3d(array)
+def show_3d_plot(x, y, z):
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
-    ax.scatter(px, py, pz, c=py, cmap='plasma_r', marker='.')
+    ax.scatter(x, y, z, c=y, cmap='plasma_r', marker='.')
+    plt.show()
+
+
+def create_clusters(points, eps=9, min_samples=5):
+    model = DBSCAN(eps=eps, min_samples=min_samples)
+    # fit model and predict clusters
+    yhat = model.fit_predict(points)
+    # retrieve unique clusters
+    clusters = numpy.unique(yhat)
+    # create scatter plot for samples from each cluster
+    result = []
+    for cluster in clusters:
+        # get row indexes for samples with this cluster
+        row_ix = numpy.where(yhat == cluster)
+        # create scatter of these samples
+        result.append(points[row_ix, :][0])
+    return result
+
+
+def plot_clusters(list_of_clusters):
+    clusters_fig = plt.figure()
+    subplot = clusters_fig.add_subplot(projection='3d')
+    for cluster in list_of_clusters:
+        subplot.scatter(cluster[:, 0], cluster[:, 1], cluster[:, 2], marker='.')
+    # show the plot
     plt.show()
 
 
@@ -66,5 +91,9 @@ if __name__ == '__main__':
     depth_data = get_data_from_file(filename)
     print(depth_data.shape)
     show_2d_plot(depth_data)
-    show_3d_plot(depth_data, scatter=8)
+    px, py, pz = get_points_coordinates(depth_data, step=8)
+    show_3d_plot(px, py, pz)
+    X = numpy.asarray(list(zip(px, py, pz)))
+    clusters = create_clusters(X, 9, 5)
+    plot_clusters(clusters)
 
