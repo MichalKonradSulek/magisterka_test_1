@@ -1,9 +1,9 @@
-import numpy
-import matplotlib.pyplot as plt
 import itertools
 import math
+
+import matplotlib.pyplot as plt
+import numpy
 from sklearn.cluster import DBSCAN
-from sklearn.datasets import make_classification
 
 
 def get_data_from_file(filepath):
@@ -12,13 +12,13 @@ def get_data_from_file(filepath):
     return original_data[0, 0, :, :]
 
 
-def get_points_coordinates(array, step: int = 1):
+def get_points_coordinates(array, step_width: int = 1, step_height: int = 1):
     x = []
     y = []
     z = []
     width = array.shape[1]
     height = array.shape[0]
-    for v, h in itertools.product(range(0, height, step), range(0, width, step)):
+    for v, h in itertools.product(range(0, height, step_height), range(0, width, step_width)):
         x.append(h)
         z.append(height - v - 1)
         y.append(array[v, h])
@@ -55,12 +55,15 @@ def show_2d_plot(array):
 
 def show_3d_plot(x, y, z):
     fig = plt.figure()
-    ax = fig.add_subplot(projection='3d')
-    ax.scatter(x, y, z, c=y, cmap='plasma_r', marker='.')
+    subplot = fig.add_subplot(projection='3d')
+    subplot.set_xlabel('x')
+    subplot.set_ylabel('y')
+    subplot.set_zlabel('z')
+    subplot.scatter(x, y, z, c=y, cmap='plasma_r', marker='.')
     plt.show()
 
 
-def create_clusters(points, eps=9, min_samples=5):
+def create_clusters(points, eps: float = 9, min_samples=5):
     model = DBSCAN(eps=eps, min_samples=min_samples)
     # fit model and predict clusters
     yhat = model.fit_predict(points)
@@ -79,21 +82,42 @@ def create_clusters(points, eps=9, min_samples=5):
 def plot_clusters(list_of_clusters):
     clusters_fig = plt.figure()
     subplot = clusters_fig.add_subplot(projection='3d')
+    subplot.set_xlabel('x')
+    subplot.set_ylabel('y')
+    subplot.set_zlabel('z')
     for cluster in list_of_clusters:
         subplot.scatter(cluster[:, 0], cluster[:, 1], cluster[:, 2], marker='.')
-    # show the plot
     plt.show()
+
+
+def plot_clusters_2d(list_of_clusters):
+    fig = plt.figure()
+    subplot = fig.add_subplot()
+    subplot.set_xlabel('x')
+    subplot.set_ylabel('z')
+    for cluster in list_of_clusters:
+        subplot.scatter(cluster[:, 0], cluster[:, 2], marker='.')
+    plt.show()
+
+
+def modify_points(points, width_modifier=1.0, height_modifier=1.0, depth_modifier=2.0):
+    points[:, 0] = points[:, 0] * width_modifier
+    points[:, 1] = points[:, 1] * depth_modifier
+    points[:, 2] = points[:, 2] * height_modifier
+    return points
 
 
 if __name__ == '__main__':
     print("test.py")
-    filename = "C:/Users/Michal/PycharmProjects/monodepth2/assets/DSC_1838_depth.npy"
+    filename = "C:\\Users\\Michal\\Pictures\\Test\\test7_depth.npy"
     depth_data = get_data_from_file(filename)
     print(depth_data.shape)
-    show_2d_plot(depth_data)
-    px, py, pz = get_points_coordinates(depth_data, step=8)
-    show_3d_plot(px, py, pz)
+    # show_2d_plot(depth_data)
+    px, py, pz = get_points_coordinates(depth_data, step_width=5, step_height=4)
+    # show_3d_plot(px, py, pz)
     X = numpy.asarray(list(zip(px, py, pz)))
-    clusters = create_clusters(X, 9, 5)
+    X = modify_points(X, width_modifier=1, height_modifier=1, depth_modifier=20)
+    clusters = create_clusters(X, eps=8.1, min_samples=5)
     plot_clusters(clusters)
+    plot_clusters_2d(clusters)
 
