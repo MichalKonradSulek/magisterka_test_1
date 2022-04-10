@@ -109,15 +109,15 @@ def modify_points(points, width_modifier=1.0, height_modifier=1.0, depth_modifie
 
 if __name__ == '__main__':
     print("test.py")
-    filename = "C:\\Users\\Michal\\Pictures\\Test\\test7_depth.npy"
+    filename = "C:\\Users\\Michal\\Pictures\\Test\\DSC_0055_depth.npy"
     depth_data = get_data_from_file(filename)
     print(depth_data.shape)
     # show_2d_plot(depth_data)
     px, py, pz = get_points_coordinates(depth_data, step_width=5, step_height=4)
-    # show_3d_plot(px, py, pz)
+    show_3d_plot(px, py, pz)
     X = numpy.asarray(list(zip(px, py, pz)))
     X = modify_points(X, width_modifier=1, height_modifier=1, depth_modifier=20)
-    clusters = create_clusters(X, eps=8.1, min_samples=5)
+    clusters = create_clusters(X, eps=7.1, min_samples=5)
     plot_clusters(clusters)
     plot_clusters_2d(clusters)
 
