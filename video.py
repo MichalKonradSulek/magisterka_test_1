@@ -15,12 +15,12 @@ import matplotlib.cm as cm
 import torch
 from torchvision import transforms, datasets
 
-import networks
-from layers import disp_to_depth
-from trained_net import TrainedNet
-from utils import download_model_if_doesnt_exist
-from evaluate_depth import STEREO_SCALE_FACTOR
-from timer import MyTimer
+import monodepth2.networks as networks
+from monodepth2.layers import disp_to_depth
+from utilities.trained_net import TrainedNet
+from monodepth2.utils import download_model_if_doesnt_exist
+from monodepth2.evaluate_depth import STEREO_SCALE_FACTOR
+from utilities.timer import MyTimer
 
 
 def prepare_trained_net(args):
@@ -138,6 +138,7 @@ def test_video(args):
 
 
 if __name__ == '__main__':
+
     input_args = mock.Mock()
     input_args.video_path = "C:\\Users\\Michal\\Videos\\EPART\\EPART_LAB2.mp4"
     input_args.model_name = "mono+stereo_640x192"
