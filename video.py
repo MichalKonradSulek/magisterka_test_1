@@ -93,6 +93,9 @@ def test_video(args):
             # LOAD FRAME
             success, image = video.read()
 
+            cv2.imshow("original", image)
+
+
             time_loading = timer.get_time_from_last_point()
 
             # PREPROCESS FRAME
@@ -140,7 +143,8 @@ def test_video(args):
 if __name__ == '__main__':
 
     input_args = mock.Mock()
-    input_args.video_path = "C:\\Users\\Michal\\Videos\\EPART\\EPART_LAB2.mp4"
+    input_args.video_path = "C:\\Users\\Michal\\Videos\\VID_20220411_212615471.mp4"
+    # input_args.video_path = "C:\\Users\\Michal\\Videos\\EPART\\EPART_LAB2.mp4"
     input_args.model_name = "mono+stereo_640x192"
     input_args.pred_metric_depth = True
     input_args.no_cuda = False
