@@ -134,7 +134,7 @@ class Monodepth2VideoInterpreter:
                       (self.frame_counter, time_loading, time_preprocessing, time_prediction, time_output_modification,
                        time_elapsed, fps))
 
-            return success, metric_depth
+            return success, metric_depth.squeeze()
         else:
             return success, None
 

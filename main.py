@@ -6,6 +6,8 @@ import numpy as np
 from sklearn.cluster import DBSCAN
 from video import Monodepth2VideoInterpreter
 from open3d_visualizer import Open3dVisualizer
+from point_cloud_generation import generate_3d_point_cloud
+from point_cloud_generation import generate_points_with_pix_coordinates
 
 
 def get_data_from_file(filepath):
@@ -124,17 +126,14 @@ if __name__ == '__main__':
 
     video_path = "C:\\Users\\Michal\\Videos\\VID_20220411_212615471.mp4"
     video_provider = Monodepth2VideoInterpreter(video_path)
-    points_visualizer = Open3dVisualizer()
+    points_visualizer = Open3dVisualizer(max_depth=20.0)
 
     success, depth_frame = video_provider.get_next_depth_frame()
     while success:
-        x, y, z = get_points_coordinates(depth_frame.squeeze())
-        xyz = np.zeros((np.size(x), 3))
-        xyz[:, 0] = np.reshape(x, -1)
-        xyz[:, 1] = np.reshape(y, -1)
-        xyz[:, 2] = np.reshape(z, -1)
+        # xyz = generate_3d_point_cloud(depth_frame)
+        point_cloud = generate_points_with_pix_coordinates(depth_frame)
 
-        points_visualizer.change_points(xyz)
+        points_visualizer.change_points(point_cloud)
         success, depth_frame = video_provider.get_next_depth_frame()
     points_visualizer.destroy_window()
 
