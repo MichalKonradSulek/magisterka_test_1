@@ -1,10 +1,8 @@
 import itertools
-import math
 import time
 
 import open3d as o3d
 import numpy as np
-import threading
 
 
 class Open3dVisualizer:
@@ -13,13 +11,16 @@ class Open3dVisualizer:
         self.visualizer.create_window(window_name=window_name, width=window_width, height=window_height)
 
         render_options = self.visualizer.get_render_option()
-        render_options.background_color = (0.8, 0.8, 1.0)
+        render_options.background_color = (0.498, 0.788, 1)
         render_options.light_on = True
 
         self.pcd = None
 
     def wait_for_window_closure(self):
         self.visualizer.run()
+
+    def destroy_window(self):
+        self.visualizer.destroy_window()
 
     def add_points(self, points):
         self.pcd = o3d.geometry.PointCloud()
@@ -30,10 +31,13 @@ class Open3dVisualizer:
         # visualizer.update_renderer()
 
     def change_points(self, new_points):
-        self.pcd.points = o3d.utility.Vector3dVector(new_points)
-        self.visualizer.update_geometry(self.pcd)
-        self.visualizer.poll_events()
-        # visualizer.update_renderer()
+        if self.pcd is None:
+            self.add_points(new_points)
+        else:
+            self.pcd.points = o3d.utility.Vector3dVector(new_points)
+            self.visualizer.update_geometry(self.pcd)
+            self.visualizer.poll_events()
+            # visualizer.update_renderer()
 
 
 def get_data_from_file(filepath):
@@ -74,6 +78,7 @@ if __name__ == "__main__":
 
     filename = "C:\\Users\\Michal\\Pictures\\Test\\test6_depth.npy"
     depth = get_data_from_file(filename)
+    print(depth.shape)
     x, y, z = get_points_coordinates(depth)
     xyz = np.zeros((np.size(x), 3))
     xyz[:, 0] = np.reshape(x, -1)

@@ -12,6 +12,8 @@ from torchvision import transforms
 
 import monodepth2.networks as networks
 from monodepth2.utils import download_model_if_doesnt_exist
+from monodepth2.layers import disp_to_depth
+from monodepth2.evaluate_depth import STEREO_SCALE_FACTOR
 from utilities.timer import MyTimer
 from utilities.trained_net import TrainedNet
 
@@ -84,6 +86,58 @@ class Monodepth2VideoInterpreter:
         print("-> Predicting on {:s} video file".format(path))
         return video
 
+    def get_next_depth_frame(self):
+        self.frame_counter += 1
+        self.timer.start()
+
+        # LOAD FRAME
+        success, image = self.video.read()
+
+        if success:
+            time_loading = self.timer.get_time_from_last_point()
+
+            # SHOW ORIGINAL IF NEEDED
+            if self.show_original:
+                cv2.imshow("original", image)
+
+            with torch.no_grad():
+                # PREPROCESS FRAME
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                image = cv2.resize(image, (self.net.feed_width, self.net.feed_height))
+                input_image = transforms.ToTensor()(image).unsqueeze(0)
+
+                time_preprocessing = self.timer.get_time_from_last_point()
+
+                # PREDICTION
+                input_image = input_image.to(self.net.device)
+                features = self.net.encoder(input_image)
+                outputs = self.net.decoder(features)
+
+                time_prediction = self.timer.get_time_from_last_point()
+
+                # OUTPUT MODIFICATIONS
+                disp = outputs[("disp", 0)]
+                scaled_disp, depth = disp_to_depth(disp, 0.1, 100)
+                metric_depth = STEREO_SCALE_FACTOR * depth.cpu().numpy()
+
+                time_output_modification = self.timer.get_time_from_last_point()
+
+            # # IMAGE PRESENTATION
+            # cv2.imshow("image", cv2.cvtColor(colormapped_im, cv2.COLOR_RGB2BGR))
+            # cv2.waitKey(1)
+            # time_presentation = timer.get_time_from_last_point()
+
+            if self.print_times:
+                time_elapsed = time_loading + time_preprocessing + time_prediction + time_output_modification
+                fps = 1 / time_elapsed
+                print("frame: %4d ld: %7.5f pp: %7.5f pd: %7.5f om: %7.5f el: %7.5f fps: %4.1f" %
+                      (self.frame_counter, time_loading, time_preprocessing, time_prediction, time_output_modification,
+                       time_elapsed, fps))
+
+            return success, metric_depth
+        else:
+            return success, None
+
     def get_next_disparity_frame(self):
         self.frame_counter += 1
         self.timer.start()
@@ -144,7 +198,7 @@ class Monodepth2VideoInterpreter:
             return success, None
 
 
-def test_video1(video_path):
+def test_video(video_path):
     video_provider = Monodepth2VideoInterpreter(video_path)
     success, disparity_frame = video_provider.get_next_disparity_frame()
     while success:
@@ -155,4 +209,4 @@ def test_video1(video_path):
 
 if __name__ == '__main__':
     video_path = "C:\\Users\\Michal\\Videos\\VID_20220411_212615471.mp4"
-    test_video1(video_path)
+    test_video(video_path)

@@ -2,13 +2,15 @@ import itertools
 import math
 
 import matplotlib.pyplot as plt
-import numpy
+import numpy as np
 from sklearn.cluster import DBSCAN
+from video import Monodepth2VideoInterpreter
+from open3d_visualizer import Open3dVisualizer
 
 
 def get_data_from_file(filepath):
     print("file: " + filepath)
-    original_data = numpy.load(filepath)
+    original_data = np.load(filepath)
     return original_data[0, 0, :, :]
 
 
@@ -47,7 +49,6 @@ def get_points_in_3d(array):
         y.append(f * k)
     return x, y, z
 
-
 def show_2d_plot(array):
     plt.imshow(array, interpolation='none')
     plt.show()
@@ -68,12 +69,12 @@ def create_clusters(points, eps: float = 9, min_samples=5):
     # fit model and predict clusters
     yhat = model.fit_predict(points)
     # retrieve unique clusters
-    clusters = numpy.unique(yhat)
+    clusters = np.unique(yhat)
     # create scatter plot for samples from each cluster
     result = []
     for cluster in clusters:
         # get row indexes for samples with this cluster
-        row_ix = numpy.where(yhat == cluster)
+        row_ix = np.where(yhat == cluster)
         # create scatter of these samples
         result.append(points[row_ix, :][0])
     return result
@@ -108,16 +109,33 @@ def modify_points(points, width_modifier=1.0, height_modifier=1.0, depth_modifie
 
 
 if __name__ == '__main__':
-    print("test.py")
-    filename = "C:\\Users\\Michal\\Pictures\\Test\\DSC_0055_depth.npy"
-    depth_data = get_data_from_file(filename)
-    print(depth_data.shape)
-    # show_2d_plot(depth_data)
-    px, py, pz = get_points_coordinates(depth_data, step_width=5, step_height=4)
-    show_3d_plot(px, py, pz)
-    X = numpy.asarray(list(zip(px, py, pz)))
-    X = modify_points(X, width_modifier=1, height_modifier=1, depth_modifier=20)
-    clusters = create_clusters(X, eps=7.1, min_samples=5)
-    plot_clusters(clusters)
-    plot_clusters_2d(clusters)
+    # print("test.py")
+    # filename = "C:\\Users\\Michal\\Pictures\\Test\\DSC_0055_depth.npy"
+    # depth_data = get_data_from_file(filename)
+    # print(depth_data.shape)
+    # # show_2d_plot(depth_data)
+    # px, py, pz = get_points_coordinates(depth_data, step_width=5, step_height=4)
+    # show_3d_plot(px, py, pz)
+    # X = numpy.asarray(list(zip(px, py, pz)))
+    # X = modify_points(X, width_modifier=1, height_modifier=1, depth_modifier=20)
+    # clusters = create_clusters(X, eps=7.1, min_samples=5)
+    # plot_clusters(clusters)
+    # plot_clusters_2d(clusters)
+
+    video_path = "C:\\Users\\Michal\\Videos\\VID_20220411_212615471.mp4"
+    video_provider = Monodepth2VideoInterpreter(video_path)
+    points_visualizer = Open3dVisualizer()
+
+    success, depth_frame = video_provider.get_next_depth_frame()
+    while success:
+        x, y, z = get_points_coordinates(depth_frame.squeeze())
+        xyz = np.zeros((np.size(x), 3))
+        xyz[:, 0] = np.reshape(x, -1)
+        xyz[:, 1] = np.reshape(y, -1)
+        xyz[:, 2] = np.reshape(z, -1)
+
+        points_visualizer.change_points(xyz)
+        success, depth_frame = video_provider.get_next_depth_frame()
+    points_visualizer.destroy_window()
+
 
