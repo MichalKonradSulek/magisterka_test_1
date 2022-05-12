@@ -65,26 +65,18 @@ class Open3dVisualizer:
             # visualizer.update_renderer()
 
     @staticmethod
-    def __calculate_center_of_cloud(point_clouds):
-        maximum = []
-        minimum = []
-        for cloud in point_clouds:
-            maximum.append(cloud.max(axis=0))
-            minimum.append(cloud.min(axis=0))
-        maximum = np.array(maximum)
-        minimum = np.array(minimum)
-        max_val = maximum.max(axis=0)
-        min_val = minimum.min(axis=0)
-        center = (max_val + min_val) / 2
+    def __calculate_look_at_point(point_clouds):
+        points = np.concatenate(point_clouds, axis=0)
+        maximum = points.max(axis=0)
+        minimum = points.min(axis=0)
+        center = (maximum + minimum) / 2
+        center[2] = 0.0
         return center
 
     def __setup_camera_view(self, point_clouds):
         self.visualizer.get_view_control().set_front((0.5, -0.2, -1.0))
         self.visualizer.get_view_control().set_up((0.0, -1.0, 0.0))
-        look_at_point = Open3dVisualizer.__calculate_center_of_cloud(point_clouds)
-        look_at_point[2] = 0.0
-        print(look_at_point)
-        self.visualizer.get_view_control().set_lookat(look_at_point)
+        self.visualizer.get_view_control().set_lookat(Open3dVisualizer.__calculate_look_at_point(point_clouds))
         self.visualizer.get_view_control().set_zoom(0.5)
 
     def show_clouds(self, point_clouds):
