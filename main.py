@@ -7,25 +7,7 @@ from sklearn.cluster import DBSCAN
 from video import Monodepth2VideoInterpreter
 from visualizer.open3d_visualizer import Open3dVisualizer
 from point_cloud_generation import generate_points_with_pix_coordinates
-
-
-def get_data_from_file(filepath):
-    print("file: " + filepath)
-    original_data = np.load(filepath)
-    return original_data[0, 0, :, :]
-
-
-def get_points_coordinates(array, step_width: int = 1, step_height: int = 1):
-    x = []
-    y = []
-    z = []
-    width = array.shape[1]
-    height = array.shape[0]
-    for v, h in itertools.product(range(0, height, step_height), range(0, width, step_width)):
-        x.append(h)
-        z.append(height - v - 1)
-        y.append(array[v, h])
-    return x, y, z
+from clustering.dbscan_clustering import create_clusters
 
 
 def get_points_in_3d(array):
@@ -63,22 +45,6 @@ def show_3d_plot(x, y, z):
     subplot.set_zlabel('z')
     subplot.scatter(x, y, z, c=y, cmap='plasma_r', marker='.')
     plt.show()
-
-
-def create_clusters(points, eps: float = 9, min_samples=5):
-    model = DBSCAN(eps=eps, min_samples=min_samples)
-    # fit model and predict clusters
-    yhat = model.fit_predict(points)
-    # retrieve unique clusters
-    clusters = np.unique(yhat)
-    # create scatter plot for samples from each cluster
-    result = []
-    for cluster in clusters:
-        # get row indexes for samples with this cluster
-        row_ix = np.where(yhat == cluster)
-        # create scatter of these samples
-        result.append(points[row_ix, :][0])
-    return result
 
 
 def plot_clusters(list_of_clusters):
@@ -131,8 +97,11 @@ if __name__ == '__main__':
     while success:
         # xyz = generate_3d_point_cloud(depth_frame)
         point_cloud = generate_points_with_pix_coordinates(depth_frame)
+        # points_visualizer.change_points(point_cloud)
 
-        points_visualizer.change_points(point_cloud)
+        clusters = create_clusters(point_cloud, eps=3)
+        points_visualizer.show_clouds(clusters)
+
         success, depth_frame = video_provider.get_next_depth_frame()
     points_visualizer.destroy_window()
 
