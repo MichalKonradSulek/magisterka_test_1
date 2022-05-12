@@ -1,4 +1,4 @@
-import itertools
+from itertools import cycle
 
 import open3d as o3d
 import numpy as np
@@ -17,6 +17,16 @@ class Open3dVisualizer:
         self.pcd = None
         self.is_color_depth = color_depth
         self.max_depth_color_value = max_depth
+        self.default_colors = [(1.0, 1.0, 1.0),
+                               (0.0, 0.0, 1.0),
+                               (0.0, 1.0, 0.0),
+                               (1.0, 0.0, 0.0),
+                               (1.0, 1.0, 0.0),
+                               (1.0, 0.0, 1.0),
+                               (0.0, 1.0, 1.0),
+                               (0.5, 0.5, 1.0),
+                               (0.5, 1.0, 0.5),
+                               (1.0, 0.5, 0.5)]
 
     def wait_for_window_closure(self):
         self.visualizer.run()
@@ -24,17 +34,20 @@ class Open3dVisualizer:
     def destroy_window(self):
         self.visualizer.destroy_window()
 
-    def __get_points_grey_scale(self, points, axis=2):
+    def __get_points_color_scale(self, points, color, axis=2):
         column = 1 - np.expand_dims(points[:, axis], axis=1) / self.max_depth_color_value
-        return np.concatenate((column, column, column), axis=1)
+        return np.concatenate((column * color[0], column * color[1], column * color[2]), axis=1)
+
+    def __colour_points(self, pcd, color):
+        if self.is_color_depth:
+            pcd.colors = o3d.utility.Vector3dVector(self.__get_points_color_scale(np.asarray(pcd.points), color=color))
+        else:
+            pcd.paint_uniform_color(color)
 
     def add_points(self, points):
         self.pcd = o3d.geometry.PointCloud()
         self.pcd.points = o3d.utility.Vector3dVector(points)
-        if self.is_color_depth:
-            self.pcd.colors = o3d.utility.Vector3dVector(self.__get_points_grey_scale(points))
-        else:
-            self.pcd.paint_uniform_color([0.5, 0.5, 0.5])
+        self.__colour_points(self.pcd, (1.0, 1.0, 1.0))
         self.visualizer.add_geometry(self.pcd)
         self.visualizer.poll_events()
         # visualizer.update_renderer()
@@ -44,33 +57,19 @@ class Open3dVisualizer:
             self.add_points(new_points)
         else:
             self.pcd.points = o3d.utility.Vector3dVector(new_points)
-            if self.is_color_depth:
-                self.pcd.colors = o3d.utility.Vector3dVector(self.__get_points_grey_scale(new_points))
+            self.__colour_points(self.pcd, (1.0, 1.0, 1.0))
             self.visualizer.update_geometry(self.pcd)
             self.visualizer.poll_events()
             # visualizer.update_renderer()
 
+    def show_clouds(self, point_clouds):
+        self.visualizer.clear_geometries()
+        for point_cloud, color in zip(point_clouds, cycle(self.default_colors)):
+            self.__add_cloud(point_cloud, color)
+        self.visualizer.poll_events()
 
-def get_data_from_file(filepath):
-    print("file: " + filepath)
-    original_data = np.load(filepath)
-    return original_data[0, 0, :, :]
-
-
-def get_points_coordinates(array, step_width: int = 1, step_height: int = 1):
-    x = []
-    y = []
-    z = []
-    width = array.shape[1]
-    height = array.shape[0]
-    for v, h in itertools.product(range(0, height, step_height), range(0, width, step_width)):
-        x.append(h)
-        z.append(height - v - 1)
-        y.append(array[v, h])
-    return x, y, z
-
-
-def run_window(window):
-    window.run()
-
-
+    def __add_cloud(self, point_cloud, color):
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(point_cloud)
+        self.__colour_points(pcd, color)
+        self.visualizer.add_geometry(pcd)

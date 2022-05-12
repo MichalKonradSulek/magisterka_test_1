@@ -13,10 +13,13 @@ if __name__ == "__main__":
     xyz = generate_points_with_pix_coordinates(depth)
     print(xyz)
 
-    visualizer = Open3dVisualizer(max_depth=1000)
-    visualizer.add_points(xyz)
+    split_points = np.split(xyz, 20)
+
+    visualizer = Open3dVisualizer(max_depth=100)
+    visualizer.show_clouds(split_points)
     for i in range(10):
-        xyz = xyz + 10
-        visualizer.change_points(xyz)
+        for j, v in enumerate(split_points):
+            split_points[j] = split_points[j] + 10
+        visualizer.show_clouds(split_points)
         time.sleep(1)
     visualizer.wait_for_window_closure()
