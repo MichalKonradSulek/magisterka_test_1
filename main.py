@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.cluster import DBSCAN
 from video import Monodepth2VideoInterpreter
-from open3d_visualizer import Open3dVisualizer
-from point_cloud_generation import generate_3d_point_cloud
+from visualizer.open3d_visualizer import Open3dVisualizer
 from point_cloud_generation import generate_points_with_pix_coordinates
 
 

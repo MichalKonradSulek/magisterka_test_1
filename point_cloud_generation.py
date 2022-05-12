@@ -1,5 +1,5 @@
 import numpy as np
-from open3d_visualizer import Open3dVisualizer
+from visualizer.open3d_visualizer import Open3dVisualizer
 
 
 def generate_3d_point_cloud(depth_array, f=1.7):
