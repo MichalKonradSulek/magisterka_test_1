@@ -100,6 +100,7 @@ if __name__ == '__main__':
         # points_visualizer.change_points(point_cloud)
 
         clusters = create_clusters(point_cloud, eps=3)
+        # clusters = [point_cloud]
         points_visualizer.show_clouds(clusters)
 
         success, depth_frame = video_provider.get_next_depth_frame()

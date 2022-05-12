@@ -17,6 +17,7 @@ class Open3dVisualizer:
         self.pcd = None
         self.is_color_depth = color_depth
         self.max_depth_color_value = max_depth
+        self.was_already_geometry_rendered = False
         self.default_colors = [(1.0, 1.0, 1.0),
                                (0.0, 0.0, 1.0),
                                (0.0, 1.0, 0.0),
@@ -30,6 +31,7 @@ class Open3dVisualizer:
 
     def wait_for_window_closure(self):
         self.visualizer.run()
+        self.destroy_window()
 
     def destroy_window(self):
         self.visualizer.destroy_window()
@@ -62,14 +64,40 @@ class Open3dVisualizer:
             self.visualizer.poll_events()
             # visualizer.update_renderer()
 
+    @staticmethod
+    def __calculate_center_of_cloud(point_clouds):
+        maximum = []
+        minimum = []
+        for cloud in point_clouds:
+            maximum.append(cloud.max(axis=0))
+            minimum.append(cloud.min(axis=0))
+        maximum = np.array(maximum)
+        minimum = np.array(minimum)
+        max_val = maximum.max(axis=0)
+        min_val = minimum.min(axis=0)
+        center = (max_val + min_val) / 2
+        return center
+
+    def __setup_camera_view(self, point_clouds):
+        self.visualizer.get_view_control().set_front((0.5, -0.2, -1.0))
+        self.visualizer.get_view_control().set_up((0.0, -1.0, 0.0))
+        look_at_point = Open3dVisualizer.__calculate_center_of_cloud(point_clouds)
+        look_at_point[2] = 0.0
+        print(look_at_point)
+        self.visualizer.get_view_control().set_lookat(look_at_point)
+        self.visualizer.get_view_control().set_zoom(0.5)
+
     def show_clouds(self, point_clouds):
         self.visualizer.clear_geometries()
         for point_cloud, color in zip(point_clouds, cycle(self.default_colors)):
-            self.__add_cloud(point_cloud, color)
+            self.__add_cloud(point_cloud, color, not self.was_already_geometry_rendered)
+        if not self.was_already_geometry_rendered:
+            self.__setup_camera_view(point_clouds)
+            self.was_already_geometry_rendered = True
         self.visualizer.poll_events()
 
-    def __add_cloud(self, point_cloud, color):
+    def __add_cloud(self, point_cloud, color, reset_bb):
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(point_cloud)
         self.__colour_points(pcd, color)
-        self.visualizer.add_geometry(pcd)
+        self.visualizer.add_geometry(pcd, reset_bounding_box=reset_bb)
