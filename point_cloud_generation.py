@@ -1,8 +1,10 @@
+import math
+
 import numpy as np
 from visualizer.open3d_visualizer import Open3dVisualizer
 
 
-def generate_3d_point_cloud(depth_array, f=1.7):
+def generate_3d_point_cloud(depth_array, f=0.00405, pix_size=0.00000112):
     # To się da przyspieszyć, tworząc gotową macierz o wymiarze zdjęcia i mnożąc jedną przez drugą
     width_pix = depth_array.shape[1]
     height_pix = depth_array.shape[0]
@@ -11,9 +13,11 @@ def generate_3d_point_cloud(depth_array, f=1.7):
     result = []
     for ih, iw in np.ndindex(depth_array.shape):
         depth = depth_array[ih, iw]
-        height = (ih - cph) * depth / f
-        width = (iw - cpw) * depth / f
-        result.append([width, height, depth])
+        mw = (iw - cpw) * pix_size
+        mh = (ih - cph) * pix_size
+        md = math.sqrt(mw ** 2 + mh ** 2 + f ** 2)
+        k = depth / md
+        result.append([mw * k, mh * k, f * k])
     return np.array(result)
 
 
@@ -28,8 +32,8 @@ if __name__ == '__main__':
     filepath = "C:\\Users\\Michal\\Pictures\\Test\\test5_depth.npy"
     print("file: " + filepath)
     depth_array = np.load(filepath)
-    # point_cloud = generate_3d_point_cloud(depth_array.squeeze())
-    point_cloud = generate_points_with_pix_coordinates(depth_array.squeeze())
+    point_cloud = generate_3d_point_cloud(depth_array.squeeze(), f=0.00405, pix_size=0.0000112)
+    # point_cloud = generate_points_with_pix_coordinates(depth_array.squeeze())
     visualizer = Open3dVisualizer()
     visualizer.add_points(point_cloud)
     visualizer.wait_for_window_closure()

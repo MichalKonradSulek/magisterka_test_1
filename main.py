@@ -7,6 +7,7 @@ from sklearn.cluster import DBSCAN
 from video import Monodepth2VideoInterpreter
 from visualizer.open3d_visualizer import Open3dVisualizer
 from point_cloud_generation import generate_points_with_pix_coordinates
+from point_cloud_generation import generate_3d_point_cloud
 from clustering.dbscan_clustering import create_clusters
 
 
@@ -89,18 +90,23 @@ if __name__ == '__main__':
     # plot_clusters(clusters)
     # plot_clusters_2d(clusters)
 
-    video_path = "C:\\Users\\Michal\\Videos\\VID_20220411_212615471.mp4"
+    # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_142748920.mp4"
+    # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_142911005.mp4"
+    # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_142953829.mp4"
+    video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143053656.mp4"
+    # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143324266.mp4"
     video_provider = Monodepth2VideoInterpreter(video_path)
     points_visualizer = Open3dVisualizer(max_depth=20.0)
 
     success, depth_frame = video_provider.get_next_depth_frame()
     while success:
         # xyz = generate_3d_point_cloud(depth_frame)
-        point_cloud = generate_points_with_pix_coordinates(depth_frame)
+        # point_cloud = generate_points_with_pix_coordinates(depth_frame)
+        point_cloud = generate_3d_point_cloud(depth_frame, f=0.00405, pix_size=0.0000112)
         # points_visualizer.change_points(point_cloud)
 
-        clusters = create_clusters(point_cloud, eps=3)
-        # clusters = [point_cloud]
+        clusters = [point_cloud]
+        # clusters = create_clusters(point_cloud, eps=3)
         points_visualizer.show_clouds(clusters)
 
         success, depth_frame = video_provider.get_next_depth_frame()
