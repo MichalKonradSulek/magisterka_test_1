@@ -1,5 +1,5 @@
 import numpy as np
-from point_cloud_generation import generate_points_with_pix_coordinates
+from cloud_generation import generate_points_with_pix_coordinates
 
 from dbscan_clustering import create_clusters
 from visualizer.open3d_visualizer import Open3dVisualizer

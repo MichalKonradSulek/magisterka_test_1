@@ -9,6 +9,7 @@ from visualizer.open3d_visualizer import Open3dVisualizer
 from point_cloud_generation import generate_points_with_pix_coordinates
 from point_cloud_generation import generate_3d_point_cloud
 from clustering.dbscan_clustering import create_clusters
+from cloud_generation.point_cloud_generator import PointCloudGenerator
 
 
 def get_points_in_3d(array):
@@ -96,13 +97,16 @@ if __name__ == '__main__':
     video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143053656.mp4"
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143324266.mp4"
     video_provider = Monodepth2VideoInterpreter(video_path)
+    cloud_generator = PointCloudGenerator(640, 192, 0.0043008, 0.0024192, 0.00405)
     points_visualizer = Open3dVisualizer(max_depth=20.0)
+
 
     success, depth_frame = video_provider.get_next_depth_frame()
     while success:
         # xyz = generate_3d_point_cloud(depth_frame)
         # point_cloud = generate_points_with_pix_coordinates(depth_frame)
-        point_cloud = generate_3d_point_cloud(depth_frame, f=0.00405, pix_size=0.0000112)
+        # point_cloud = generate_3d_point_cloud(depth_frame, f=0.00405, pix_size=0.0000112)
+        point_cloud = cloud_generator.generate(depth_frame)
         # points_visualizer.change_points(point_cloud)
 
         clusters = [point_cloud]

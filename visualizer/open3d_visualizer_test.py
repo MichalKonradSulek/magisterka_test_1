@@ -1,7 +1,7 @@
 import time
 import numpy as np
 
-from point_cloud_generation import generate_points_with_pix_coordinates
+from cloud_generation import generate_points_with_pix_coordinates
 from open3d_visualizer import Open3dVisualizer
 
 
