@@ -1,10 +1,14 @@
 import itertools
 import math
+import os
+
+import cv2
 
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.cluster import DBSCAN
 from video import Monodepth2VideoInterpreter
+from speed_calculator import SpeedCalculator
 from visualizer.open3d_visualizer import Open3dVisualizer
 from point_cloud_generation import generate_points_with_pix_coordinates
 from point_cloud_generation import generate_3d_point_cloud
@@ -91,29 +95,43 @@ if __name__ == '__main__':
     # plot_clusters(clusters)
     # plot_clusters_2d(clusters)
 
-    # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_142748920.mp4"
+    video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_142748920.mp4"
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_142911005.mp4"
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_142953829.mp4"
-    video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143053656.mp4"
+    # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143053656.mp4"
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143324266.mp4"
     video_provider = Monodepth2VideoInterpreter(video_path)
-    cloud_generator = PointCloudGenerator(640, 192, 0.0043008, 0.0024192, 0.00405)
-    points_visualizer = Open3dVisualizer(max_depth=20.0)
-
+    speed_calculator = SpeedCalculator()
+    # cloud_generator = PointCloudGenerator(640, 192, 0.0043008, 0.0024192, 0.00405)
+    # points_visualizer = Open3dVisualizer(max_depth=20.0)
 
     success, depth_frame = video_provider.get_next_depth_frame()
     while success:
+        pixel_speed = speed_calculator.get_pixel_speed(depth_frame)
+        speed_positive = pixel_speed.clip(min=0.0)
+        speed_negative = pixel_speed.clip(max=0.0)
+        zeros = np.zeros(pixel_speed.shape)
+        speed_to_show = np.dstack((speed_positive, -speed_negative, zeros))
+        speed_to_show /= 5.0
+        cv2.imshow("speed", speed_to_show)
+
+        depth_to_show = depth_frame / 20
+        # depth_to_show = depth_to_show.astype(np.uint8)
+        cv2.imshow("depth", depth_to_show)
+        cv2.waitKey(100)
+
         # xyz = generate_3d_point_cloud(depth_frame)
         # point_cloud = generate_points_with_pix_coordinates(depth_frame)
         # point_cloud = generate_3d_point_cloud(depth_frame, f=0.00405, pix_size=0.0000112)
-        point_cloud = cloud_generator.generate(depth_frame)
+
+        # point_cloud = cloud_generator.generate(depth_frame)
         # points_visualizer.change_points(point_cloud)
 
-        clusters = [point_cloud]
+        # clusters = [point_cloud]
         # clusters = create_clusters(point_cloud, eps=3)
-        points_visualizer.show_clouds(clusters)
+        # points_visualizer.show_clouds(clusters)
 
         success, depth_frame = video_provider.get_next_depth_frame()
-    points_visualizer.destroy_window()
+    # points_visualizer.destroy_window()
 
 
