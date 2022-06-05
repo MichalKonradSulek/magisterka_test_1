@@ -27,6 +27,7 @@ class Monodepth2VideoInterpreter:
         self.frame_counter = 0
         self.show_original = True
         self.print_times = True
+        self.frame_shape = (192, 640)
 
     @staticmethod
     def __get_net_params():

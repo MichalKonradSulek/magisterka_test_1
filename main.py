@@ -101,13 +101,13 @@ if __name__ == '__main__':
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143053656.mp4"
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143324266.mp4"
     video_provider = Monodepth2VideoInterpreter(video_path)
-    speed_calculator = SpeedCalculator()
+    speed_calculator = SpeedCalculator(frame_shape=video_provider.frame_shape, n_of_considered_frames=30)
     # cloud_generator = PointCloudGenerator(640, 192, 0.0043008, 0.0024192, 0.00405)
     # points_visualizer = Open3dVisualizer(max_depth=20.0)
 
     success, depth_frame = video_provider.get_next_depth_frame()
     while success:
-        pixel_speed = speed_calculator.get_pixel_speed(depth_frame)
+        pixel_speed = speed_calculator.get_speed(depth_frame)
         speed_positive = pixel_speed.clip(min=0.0)
         speed_negative = pixel_speed.clip(max=0.0)
         zeros = np.zeros(pixel_speed.shape)
@@ -118,7 +118,7 @@ if __name__ == '__main__':
         depth_to_show = depth_frame / 20
         # depth_to_show = depth_to_show.astype(np.uint8)
         cv2.imshow("depth", depth_to_show)
-        cv2.waitKey(100)
+        cv2.waitKey(1)
 
         # xyz = generate_3d_point_cloud(depth_frame)
         # point_cloud = generate_points_with_pix_coordinates(depth_frame)
