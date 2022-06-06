@@ -1,14 +1,15 @@
 import itertools
 import math
 
-import cv2
-
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.cluster import DBSCAN
 from video import Monodepth2VideoInterpreter
-from pixel_speed_analysis.speed_calculator import SpeedCalculator
-from pixel_speed_analysis.collision_detection import CollisionDetector
-from pixel_speed_analysis.collision_detection import calculate_time_to_collision
+from visualizer.open3d_visualizer import Open3dVisualizer
+from point_cloud_generation import generate_points_with_pix_coordinates
+from point_cloud_generation import generate_3d_point_cloud
+from clustering.dbscan_clustering import create_clusters
+from cloud_generation.point_cloud_generator import PointCloudGenerator
 
 
 def get_points_in_3d(array):
@@ -96,51 +97,23 @@ if __name__ == '__main__':
     video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143053656.mp4"
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143324266.mp4"
     video_provider = Monodepth2VideoInterpreter(video_path)
-    speed_calculator = SpeedCalculator(frame_shape=video_provider.frame_shape, n_of_considered_frames=30)
-    collision_detector = CollisionDetector(frame_shape=video_provider.frame_shape, collision_time_threshold=5,
-                                           n_of_subsequent_frames_required=30)
-    # cloud_generator = PointCloudGenerator(640, 192, 0.0043008, 0.0024192, 0.00405)
-    # points_visualizer = Open3dVisualizer(max_depth=20.0)
+    cloud_generator = PointCloudGenerator(640, 192, 0.0043008, 0.0024192, 0.00405)
+    points_visualizer = Open3dVisualizer(max_depth=20.0)
+
 
     success, depth_frame = video_provider.get_next_depth_frame()
     while success:
-        zeros = np.zeros(depth_frame.shape)
-
-        depth_to_show = depth_frame / 20
-        cv2.imshow("depth", depth_to_show)
-
-        pixel_speed = speed_calculator.get_speed(depth_frame)
-        speed_positive = pixel_speed.clip(min=0.0)
-        speed_negative = pixel_speed.clip(max=0.0)
-        speed_to_show = np.dstack((speed_positive, -speed_negative, zeros))
-        speed_to_show /= 5.0
-        cv2.imshow("speed", speed_to_show)
-
-        time_to_collision = calculate_time_to_collision(depth_frame, pixel_speed)
-        scaled_time = - time_to_collision / 5 + 1
-        time_to_show = np.dstack((zeros, zeros, scaled_time))
-        cv2.imshow("time to collision", time_to_show)
-
-        collisions = collision_detector.get_danger_regions(time_to_collision)
-        print(collisions.min())
-        scaled_collisions_time = - collisions / 5 + 1
-        collisions_to_show = np.dstack((zeros, zeros, scaled_collisions_time))
-        cv2.imshow("collisions", collisions_to_show)
-
-        cv2.waitKey(1)
-
         # xyz = generate_3d_point_cloud(depth_frame)
         # point_cloud = generate_points_with_pix_coordinates(depth_frame)
         # point_cloud = generate_3d_point_cloud(depth_frame, f=0.00405, pix_size=0.0000112)
-
-        # point_cloud = cloud_generator.generate(depth_frame)
+        point_cloud = cloud_generator.generate(depth_frame)
         # points_visualizer.change_points(point_cloud)
 
-        # clusters = [point_cloud]
+        clusters = [point_cloud]
         # clusters = create_clusters(point_cloud, eps=3)
-        # points_visualizer.show_clouds(clusters)
+        points_visualizer.show_clouds(clusters)
 
         success, depth_frame = video_provider.get_next_depth_frame()
-    # points_visualizer.destroy_window()
+    points_visualizer.destroy_window()
 
 
