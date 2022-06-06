@@ -19,14 +19,14 @@ from utilities.trained_net import TrainedNet
 
 
 class Monodepth2VideoInterpreter:
-    def __init__(self, video_path):
+    def __init__(self, video_path, print_times=False):
         args = Monodepth2VideoInterpreter.__get_net_params()
         self.net = Monodepth2VideoInterpreter.__prepare_trained_net(args)
         self.video = Monodepth2VideoInterpreter.__load_video(video_path)
         self.timer = MyTimer()
         self.frame_counter = 0
         self.show_original = True
-        self.print_times = True
+        self.print_times = print_times
         self.frame_shape = (192, 640)
 
     @staticmethod
