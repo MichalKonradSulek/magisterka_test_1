@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 from utilities.timer import MyTimer
 from v_disparity.v_disparity import VDisparityCalculator
@@ -22,7 +23,6 @@ if __name__ == '__main__':
         timer.end_period("depth")
 
         v_disparity = disparity_calculator.create_v_disparity(depth_frame)
-        v_disparity = v_disparity > 0.5
         timer.end_period("v-disparity")
         print(v_disparity.shape)
 
@@ -30,7 +30,7 @@ if __name__ == '__main__':
         cv2.imshow("depth", depth_to_show)
         v_disparity_to_show_size = (v_disparity.shape[1] * 2, v_disparity.shape[0] * 2)
         cv2.imshow("v-disparity", cv2.resize(v_disparity, v_disparity_to_show_size))
-        cv2.waitKey(1)
+        cv2.waitKey(0)
         timer.end_period("show")
 
         timer.print_periods()
