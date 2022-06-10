@@ -6,7 +6,7 @@ from v_disparity.v_disparity import VDisparityCalculator
 from video import Monodepth2VideoInterpreter
 from v_disparity.k_ransac_line import KRansacLine
 from v_disparity.least_squares_line_fit import fit_line
-from v_disparity.plane_fittness import get_plane_pixels
+from v_disparity.plane_fittness import PlanePointsQualifier
 
 if __name__ == '__main__':
 
@@ -18,7 +18,9 @@ if __name__ == '__main__':
 
     video_provider = Monodepth2VideoInterpreter(video_path)
     disparity_calculator = VDisparityCalculator(video_provider.frame_shape)
-    line_generator = KRansacLine(k=150, point_threshold=0.1)
+    v_disparity_threshold = 0.15
+    line_generator = KRansacLine(k=150, point_threshold=v_disparity_threshold)
+    plane_pixels_qualifier = PlanePointsQualifier(frame_shape=video_provider.frame_shape, tolerance=1.0)
     timer = MyTimer()
     timer.start()
 
@@ -38,7 +40,7 @@ if __name__ == '__main__':
         best_line = fit_line(bottom_half_of_v_disparity, point_threshold=0.1)
         timer.end_period("line")
 
-        pixels_on_plane = get_plane_pixels(depth_frame, best_line, distance_to_plane=1.0)
+        pixels_on_plane = plane_pixels_qualifier.get_plane_pixels_horizontal_tolerance(depth_frame, best_line)
         timer.end_period("pixels_on_plane")
 
         depth_to_show = depth_frame / 20
@@ -47,7 +49,10 @@ if __name__ == '__main__':
         green_plane[pixels_on_plane] = 255
         cv2.imshow("depth", depth_to_show)
 
-        v_disparity_to_show = v_disparity * 4
+        # v_disparity_to_show = v_disparity * 4
+        v_disparity_to_show = np.zeros(v_disparity.shape)
+        condition = v_disparity > v_disparity_threshold
+        v_disparity_to_show[condition] = 255
         v_disparity_to_show = np.dstack((v_disparity_to_show, v_disparity_to_show, v_disparity_to_show))
         x0 = 0
         x1 = v_disparity_to_show.shape[1] - 1
