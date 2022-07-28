@@ -24,11 +24,12 @@ def paint_column(mat, x):
 def plot_column(depth_column):
     result_array = np.full(len(depth_column), False)
     result_array[0] = result_array[-1] = True
-    sxs.calculate_stixels_ends(depth_column, result_array, stixels_threshold)
+    sxs.calculate_stixels_ends(depth_column * depth_stixel_multiplier, result_array, stixels_threshold)
 
     indices = np.array(range(len(depth_column), 0, -1))
     plt.plot(depth_column, indices)
     plt.plot(depth_column[result_array], indices[result_array])
+    plt.xlim([0, 30])
     plt.show()
 
 
@@ -36,7 +37,7 @@ def mouse_callback(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         print(x, y)
         plot_column(depth_frame[:, x])
-        copy_of_frame_to_show = np.copy(original_frame_to_show)
+        copy_of_frame_to_show = np.copy(frame_with_stixels)
         paint_column(copy_of_frame_to_show, x)
         paint_cross(copy_of_frame_to_show, (x, y), (0, 0, 255))
         cv2.imshow("depth", copy_of_frame_to_show)
@@ -64,7 +65,8 @@ if __name__ == '__main__':
 
     timer = MyTimer()
     timer.start()
-    stixels_threshold = 1.0
+    stixels_threshold = 36.0
+    depth_stixel_multiplier = 20.0
 
     cv2.namedWindow("depth")
     cv2.setMouseCallback("depth", mouse_callback)
@@ -74,17 +76,17 @@ if __name__ == '__main__':
     while success:
         timer.end_period("depth")
 
-        stixels_ends = sxs.calculate_stixels_ends_for_frame(depth_frame, stixels_threshold)
+        stixels_ends = sxs.calculate_stixels_ends_for_frame(depth_frame * depth_stixel_multiplier, stixels_threshold)
         timer.end_period("stixels")
 
         zeros = np.zeros(depth_frame.shape)
         depth_to_show = depth_frame / 20
         original_frame_to_show = np.dstack((depth_to_show, depth_to_show, depth_to_show))
-        cv2.imshow("depth", original_frame_to_show)
+        # cv2.imshow("depth", original_frame_to_show)
         frame_with_stixels = np.copy(original_frame_to_show)
         frame_with_stixels[:, :, 0][stixels_ends] = 0
         frame_with_stixels[:, :, 1][stixels_ends] = 0
-        cv2.imshow("stixels", frame_with_stixels)
+        cv2.imshow("depth", frame_with_stixels)
         wait_for_key()
         timer.end_period("show")
 
