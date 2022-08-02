@@ -6,6 +6,7 @@ import queue
 
 from utilities.timer import MyTimer
 from video import Monodepth2VideoInterpreter
+from monodepth2_runner import Monodepth2Runner
 
 
 def check_pixel(x, y, included_pixels, depth, pix_queue, reference_depth, max_grad):
@@ -76,7 +77,7 @@ if __name__ == '__main__':
     video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143053656.mp4"
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143324266.mp4"
 
-    video_provider = Monodepth2VideoInterpreter(video_path, show_original=False)
+    video_provider = Monodepth2VideoInterpreter(video_path, depth_generator=Monodepth2Runner(), show_original=False)
 
     timer = MyTimer()
     timer.start()

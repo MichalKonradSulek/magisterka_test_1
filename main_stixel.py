@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from utilities.timer import MyTimer
 from video import Monodepth2VideoInterpreter
 import segmentation.stixels as sxs
+from monodepth2_runner import Monodepth2Runner
 
 
 def paint_cross(mat, center, color):
@@ -61,7 +62,7 @@ if __name__ == '__main__':
     video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143053656.mp4"
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143324266.mp4"
 
-    video_provider = Monodepth2VideoInterpreter(video_path, show_original=False)
+    video_provider = Monodepth2VideoInterpreter(video_path, depth_generator=Monodepth2Runner(), show_original=False)
 
     timer = MyTimer()
     timer.start()
