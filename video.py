@@ -8,7 +8,7 @@ def _load_video(path):
     return video
 
 
-class Monodepth2VideoInterpreter:
+class VideoInterpreter:
     def __init__(self, video_path, depth_generator, show_original=True):
         self.depth_generator = depth_generator
         self.frame_shape = depth_generator.frame_shape

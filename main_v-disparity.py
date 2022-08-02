@@ -3,7 +3,7 @@ import numpy as np
 
 from utilities.timer import MyTimer
 from v_disparity.v_disparity import VDisparityCalculator
-from video import Monodepth2VideoInterpreter
+from video import VideoInterpreter
 from v_disparity.k_ransac_line import KRansacLine
 from v_disparity.least_squares_line_fit import fit_line
 from v_disparity.plane_fittness import PlanePointsQualifier
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     sensor_height = 0.0024192
     focal_length = 0.00405
 
-    video_provider = Monodepth2VideoInterpreter(video_path, depth_generator=Monodepth2Runner())
+    video_provider = VideoInterpreter(video_path, depth_generator=Monodepth2Runner())
     disparity_calculator = VDisparityCalculator(video_provider.frame_shape)
     v_disparity_threshold = 0.15
     line_generator = KRansacLine(k=150, point_threshold=v_disparity_threshold)

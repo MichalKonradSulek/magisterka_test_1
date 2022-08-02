@@ -4,7 +4,7 @@ import numpy as np
 from pixel_speed_analysis.collision_detection import CollisionDetector
 from pixel_speed_analysis.collision_detection import calculate_time_to_collision
 from pixel_speed_analysis.speed_calculator import SpeedCalculator
-from video import Monodepth2VideoInterpreter
+from video import VideoInterpreter
 from utilities.timer import MyTimer
 from monodepth2_runner import Monodepth2Runner
 
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143053656.mp4"
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143324266.mp4"
 
-    video_provider = Monodepth2VideoInterpreter(video_path, depth_generator=Monodepth2Runner())
+    video_provider = VideoInterpreter(video_path, depth_generator=Monodepth2Runner())
 
     speed_calculator = SpeedCalculator(frame_shape=video_provider.frame_shape, n_of_considered_frames=30)
     speed_calculator_2 = SpeedCalculator(frame_shape=video_provider.frame_shape, n_of_considered_frames=2)
