@@ -1,4 +1,6 @@
 .idea/
+fast_depth
 monodepth2/
 models/
+!fast_depth/__init__.py
 !monodepth2/__init__.py
