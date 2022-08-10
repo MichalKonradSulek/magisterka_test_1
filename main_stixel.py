@@ -8,6 +8,7 @@ from utilities.timer import MyTimer
 from video import VideoInterpreter
 import segmentation.stixels as sxs
 from monodepth2_runner import Monodepth2Runner
+from utilities.image_window_controller import ImageWindowController
 
 
 def paint_cross(mat, center, color):
@@ -34,24 +35,13 @@ def plot_column(depth_column):
     plt.show()
 
 
-def mouse_callback(event, x, y, flags, param):
-    if event == cv2.EVENT_LBUTTONDOWN:
-        print(x, y)
-        plot_column(depth_frame[:, x])
-        copy_of_frame_to_show = np.copy(frame_with_stixels)
-        paint_column(copy_of_frame_to_show, x)
-        paint_cross(copy_of_frame_to_show, (x, y), (0, 0, 255))
-        cv2.imshow("depth", copy_of_frame_to_show)
-
-
-def wait_for_key():
-    is_still_waiting = True
-    while is_still_waiting:
-        key_pressed = cv2.waitKey(100)
-        if key_pressed & 0xFF == 32:
-            is_still_waiting = False
-        elif key_pressed & 0xFF == 27:
-            sys.exit()
+def callback_function(x, y):
+    print(x, y)
+    plot_column(depth_frame[:, x])
+    copy_of_frame_to_show = np.copy(frame_with_stixels)
+    paint_column(copy_of_frame_to_show, x)
+    paint_cross(copy_of_frame_to_show, (x, y), (0, 0, 255))
+    depth_window.present_image(copy_of_frame_to_show)
 
 
 if __name__ == '__main__':
@@ -64,7 +54,6 @@ if __name__ == '__main__':
 
     video_path = "C:\\Users\\Michal\\Videos\\magisterka\\chodnik\\3_nikon.MOV"
 
-
     video_provider = VideoInterpreter(video_path, depth_generator=Monodepth2Runner(), show_original=False)
 
     timer = MyTimer()
@@ -72,8 +61,11 @@ if __name__ == '__main__':
     stixels_threshold = 36.0
     depth_stixel_multiplier = 20.0
 
-    cv2.namedWindow("depth")
-    cv2.setMouseCallback("depth", mouse_callback)
+    depth_window = ImageWindowController(window_name="depth", callback_function=callback_function)
+    depth_window.wait_keys_dict = {
+        32: depth_window.stop_waiting_for_key,
+        27: sys.exit
+    }
     original_frame_to_show = None
 
     success, depth_frame = video_provider.get_next_depth_frame()
@@ -90,8 +82,9 @@ if __name__ == '__main__':
         frame_with_stixels = np.copy(original_frame_to_show)
         frame_with_stixels[:, :, 0][stixels_ends] = 0
         frame_with_stixels[:, :, 1][stixels_ends] = 0
-        cv2.imshow("depth", frame_with_stixels)
-        wait_for_key()
+        # cv2.imshow("depth", frame_with_stixels)
+        # wait_for_key()
+        depth_window.present_image(frame_with_stixels)
         timer.end_period("show")
 
         timer.print_periods()
