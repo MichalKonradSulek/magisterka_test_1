@@ -16,8 +16,11 @@ if __name__ == '__main__':
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_142748920.mp4"
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_142911005.mp4"
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_142953829.mp4"
-    video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143053656.mp4"
+    # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143053656.mp4"
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143324266.mp4"
+
+    video_path = "C:\\Users\\Michal\\Videos\\magisterka\\chodnik\\5_nikon.MOV"
+
 
     sensor_height = 0.0024192
     focal_length = 0.00405
