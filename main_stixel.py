@@ -41,7 +41,7 @@ def callback_function(x, y):
     copy_of_frame_to_show = np.copy(frame_with_stixels)
     paint_column(copy_of_frame_to_show, x)
     paint_cross(copy_of_frame_to_show, (x, y), (0, 0, 255))
-    depth_window.present_image(copy_of_frame_to_show)
+    depth_window.show_image(copy_of_frame_to_show)
 
 
 if __name__ == '__main__':
@@ -84,7 +84,7 @@ if __name__ == '__main__':
         frame_with_stixels[:, :, 1][stixels_ends] = 0
         # cv2.imshow("depth", frame_with_stixels)
         # wait_for_key()
-        depth_window.present_image(frame_with_stixels)
+        depth_window.show_image(frame_with_stixels)
         timer.end_period("show")
 
         timer.print_periods()

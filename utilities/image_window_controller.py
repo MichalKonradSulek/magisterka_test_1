@@ -38,6 +38,6 @@ class ImageWindowController:
         else:
             cv2.waitKey(0)
 
-    def present_image(self, image):
+    def show_image(self, image):
         cv2.imshow(self.window_name, image)
         self._wait_for_key()
