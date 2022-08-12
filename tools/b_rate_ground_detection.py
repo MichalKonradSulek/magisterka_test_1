@@ -1,4 +1,6 @@
 import os
+import numpy as np
+import cv2
 
 
 def get_image_pairs_from_directory(directory_path):
@@ -16,8 +18,23 @@ def get_image_pairs_from_directory(directory_path):
     return qualified_files
 
 
-if __name__ == "__main__":
-    files_dir = "C:\\Users\\Michal\\Pictures\\magisterka"
-    pairs_of_images = get_image_pairs_from_directory(files_dir)
+def compare_results(from_analysis, true):
+    from_analysis = test
+    n_true_pixels = np.count_nonzero(true)
+    stamp = (true > 0)
+    n_found_correctly = np.count_nonzero(from_analysis[stamp])
+    n_found_incorrectly = np.count_nonzero(from_analysis[~stamp])
+    return n_found_correctly/n_true_pixels, n_found_incorrectly/n_true_pixels
 
-    print(pairs_of_images)
+
+if __name__ == "__main__":
+    # files_dir = "C:\\Users\\Michal\\Pictures\\magisterka"
+    # pairs_of_images = get_image_pairs_from_directory(files_dir)
+
+    test = cv2.imread("C:\\Users\\Michal\\Pictures\\magisterka\\misc\\test.png", cv2.IMREAD_GRAYSCALE)
+    true = cv2.imread("C:\\Users\\Michal\\Pictures\\magisterka\\misc\\true.png", cv2.IMREAD_GRAYSCALE)
+
+    found_correctly, found_incorrectly = compare_results(test, true)
+
+
+    print(found_correctly, found_incorrectly)
