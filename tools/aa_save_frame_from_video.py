@@ -55,21 +55,18 @@ def save_all_frames_and_plot():
         path_plus_extension = os.path.splitext(image_path)
         depth_image_path = path_plus_extension[0] + "_depth" + path_plus_extension[1]
         disparity_image_path = path_plus_extension[0] + "_disp" + path_plus_extension[1]
-        depth_image_path_p = path_plus_extension[0] + "_depthp" + path_plus_extension[1]
         plot_path = path_plus_extension[0] + "_plot" + path_plus_extension[1]
-        print("saving:", image_path, depth_image_path, disparity_image_path, depth_image_path_p, plot_path,
+        print("saving:", image_path, depth_image_path, disparity_image_path, plot_path,
               sep="\n\t", end="\n")
         cv2.imwrite(image_path, image)
         cv2.imwrite(depth_image_path, img_utils.convert_to_savable_format(depth_to_show))
         cv2.imwrite(disparity_image_path, img_utils.convert_to_savable_format(v_disparity))
-        cv2.imwrite(depth_image_path_p, img_utils.convert_to_savable_format(copy_of_depth_to_show))
         cv2.imwrite(plot_path, column_plot)
     else:
         print("NO PLOT TO SAVE!")
 
 
 def show_column_plot(x, _):
-    print(">>> showing column plot:", x)
     global column_plot
     global copy_of_depth_to_show
     column_plot = img_utils.get_column_plot(depth[:, x], min_val=0, max_val=30)
@@ -108,6 +105,7 @@ if __name__ == "__main__":
         depth = depth_generator.generate_depth(image_rgb).squeeze()
         v_disparity = disparity_calculator.create_v_disparity(depth)
         depth_to_show = depth / 20
+        show_column_plot(int(depth_generator.frame_shape[1] / 2), None)
         depth_window.show_image(depth_to_show)
         disparity_window.show_image(v_disparity)
         window.show_image(image)
