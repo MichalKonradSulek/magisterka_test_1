@@ -9,18 +9,7 @@ from video import VideoInterpreter
 import segmentation.stixels as sxs
 from monodepth2_runner import Monodepth2Runner
 from utilities.image_window_controller import ImageWindowController
-
-
-def paint_cross(mat, center, color):
-    x = center[0]
-    y = center[1]
-    cv2.line(mat, (x - 2, y), (x + 2, y), color)
-    cv2.line(mat, (x, y - 2), (x, y + 2), color)
-
-
-def paint_column(mat, x):
-    mat[:, x, 0] = 0.0
-    mat[:, x, 2] = 0.0
+import utilities.image_operations as img_utils
 
 
 def plot_column(depth_column):
@@ -39,8 +28,8 @@ def callback_function(x, y):
     print(x, y)
     plot_column(depth_frame[:, x])
     copy_of_frame_to_show = np.copy(frame_with_stixels)
-    paint_column(copy_of_frame_to_show, x)
-    paint_cross(copy_of_frame_to_show, (x, y), (0, 0, 255))
+    img_utils.paint_column_green(copy_of_frame_to_show, x)
+    img_utils.paint_cross(copy_of_frame_to_show, (x, y), (0, 0, 255))
     depth_window.show_image(copy_of_frame_to_show)
 
 
@@ -52,7 +41,7 @@ if __name__ == '__main__':
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143053656.mp4"
     # video_path = "C:\\Users\\Michal\\Videos\\VID_20220517_143324266.mp4"
 
-    video_path = "C:\\Users\\Michal\\Videos\\magisterka\\chodnik\\3_nikon.MOV"
+    video_path = "C:\\Users\\Michal\\Videos\\magisterka\\baza_filmow\\chodnik\\3_nikon.MOV"
 
     video_provider = VideoInterpreter(video_path, depth_generator=Monodepth2Runner(), show_original=False)
 

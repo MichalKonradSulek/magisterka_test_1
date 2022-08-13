@@ -7,6 +7,7 @@ import queue
 from utilities.timer import MyTimer
 from video import VideoInterpreter
 from monodepth2_runner import Monodepth2Runner
+import utilities.image_operations as img_utils
 
 
 def check_pixel(x, y, included_pixels, depth, pix_queue, reference_depth, max_grad):
@@ -40,13 +41,6 @@ def find_object(depth, grad_x, grad_y, start_point_y_x):
     return included_pixels
 
 
-def paint_cross(mat, center, color):
-    x = center[0]
-    y = center[1]
-    cv2.line(mat, (x - 2, y), (x + 2, y), color)
-    cv2.line(mat, (x, y - 2), (x, y + 2), color)
-
-
 def mouse_callback(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         print(x, y)
@@ -55,7 +49,7 @@ def mouse_callback(event, x, y, flags, param):
         copy_of_frame_to_show = np.copy(original_frame_to_show)
         copy_of_frame_to_show[:, :, 0][shape] = 0
         copy_of_frame_to_show[:, :, 1][shape] = 0
-        paint_cross(copy_of_frame_to_show, (x, y), (0, 0, 255))
+        img_utils.paint_cross(copy_of_frame_to_show, (x, y), (0, 0, 255))
         cv2.imshow("depth", copy_of_frame_to_show)
 
 
