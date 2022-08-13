@@ -2,12 +2,14 @@ import cv2
 
 
 class ImageWindowController:
-    def __init__(self, window_name="window", callback_function=None, wait_for=None, wait_keys_dict=None):
+    def __init__(self, window_name="window", callback_function=None, wait_for=None, wait_keys_dict=None,
+                 run_cv_waitkey=True, resize_factor_x_y=None):
         self.window_name = window_name
-        self.is_callback_enabled = (callback_function is not None)
         self.callback_function = callback_function
         self.wait_for = wait_for
         self.wait_keys_dict = wait_keys_dict
+        self.run_cv_waitkey = run_cv_waitkey
+        self.resize_factor_x_y = resize_factor_x_y
 
         self._create_window()
 
@@ -39,5 +41,11 @@ class ImageWindowController:
             cv2.waitKey(0)
 
     def show_image(self, image):
-        cv2.imshow(self.window_name, image)
-        self._wait_for_key()
+        if self.resize_factor_x_y is not None:
+            target_size = (image.shape[1] * self.resize_factor_x_y[0], image.shape[0] * self.resize_factor_x_y[1])
+            image_to_show = cv2.resize(image, target_size)
+        else:
+            image_to_show = image
+        cv2.imshow(self.window_name, image_to_show)
+        if self.run_cv_waitkey:
+            self._wait_for_key()
