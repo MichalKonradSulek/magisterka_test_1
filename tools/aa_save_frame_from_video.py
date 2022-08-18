@@ -1,3 +1,7 @@
+"""
+Skrypt umożliwia zachowanie wybranej klatki z filmu
+"""
+
 import os
 import cv2
 import sys

@@ -1,3 +1,7 @@
+"""
+Skrypt umożliwia wybranie z filmu klatek, na których aparat jest ustawiony pod odpowiednim kątem
+"""
+
 import os
 import cv2
 import sys

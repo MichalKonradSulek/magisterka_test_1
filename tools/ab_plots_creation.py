@@ -1,3 +1,7 @@
+"""
+Skrypt dodający osie do obrazów, zawierających wykresy.
+"""
+
 import cv2
 import numpy as np
 import os
@@ -53,12 +57,6 @@ def add_axes(plot_img, x_min_val, x_max_val, y_min_val, y_max_val, x_label, y_la
 
 
 if __name__ == '__main__':
-    # file_path = "C:\\Users\\Michal\\Pictures\\magisterka\\ustalenie_pozycji\\DSC_0250_0_plot.png"
-    # plot = cv2.imread(file_path)
-    # plot_with_axes = add_axes(plot, 0, 20, 0, 192, "depth [m]", "h [pix]", 85, 5, 200)
-    # cv2.imshow("window", plot_with_axes)
-    # cv2.waitKey(0)
-
     dir_path = "C:\\Users\\Michal\\Pictures\\magisterka\\ustalenie_pozycji"
     files = os.listdir(dir_path)
     for file in files:
