@@ -39,3 +39,7 @@ def get_column_plot(depth_column, min_val=None, max_val=None, bg_color=(255, 255
         y2 = int(_scale(0, len(depth_column) - 1, plot_size_x_y[1], i + 1))
         cv2.line(bg, (x1, y1), (x2, y2), color=plot_color, thickness=line_thickness)
     return bg
+
+
+def join_pictures(img1, img2, img3):
+    return np.concatenate((img1, img2, img3), axis=1)
