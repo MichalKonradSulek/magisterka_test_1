@@ -7,11 +7,11 @@ def get_image_pairs_from_directory(directory_path):
     files_in_dir = os.listdir(directory_path)
     qualified_files = []
     for item in files_in_dir:
-        path = os.path.join(files_dir, item)
+        path = os.path.join(directory_path, item)
         if os.path.isfile(path):
             filename_and_extension = os.path.splitext(item)
             if filename_and_extension[1] == ".png" and not filename_and_extension[0].endswith("_true"):
-                potential_true_file = os.path.join(files_dir,
+                potential_true_file = os.path.join(directory_path,
                                                    filename_and_extension[0] + '_true' + filename_and_extension[1])
                 if os.path.exists(potential_true_file):
                     qualified_files.append((path, potential_true_file))
@@ -19,7 +19,6 @@ def get_image_pairs_from_directory(directory_path):
 
 
 def compare_results(from_analysis, true):
-    from_analysis = test
     n_true_pixels = np.count_nonzero(true)
     stamp = (true > 0)
     n_found_correctly = np.count_nonzero(from_analysis[stamp])
