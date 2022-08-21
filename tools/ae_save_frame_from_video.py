@@ -12,6 +12,7 @@ from monodepth2_runner import Monodepth2Runner
 from v_disparity.v_disparity import VDisparityCalculator
 import utilities.image_operations as img_utils
 import utilities.path_utils as path_utils
+import utilities.plot_utils as plot_utils
 
 column_plot = None
 copy_of_depth_to_show = None
@@ -64,7 +65,7 @@ def save_all_frames_and_plot():
 def show_column_plot(x, _):
     global column_plot
     global copy_of_depth_to_show
-    column_plot = img_utils.get_column_plot(depth[:, x], min_val=0, max_val=30)
+    column_plot = plot_utils.get_column_plot(depth[:, x], min_val=0, max_val=30)
     cv2.imshow("plot", column_plot)
 
     copy_of_depth_to_show = np.copy(depth_to_show)
@@ -78,7 +79,7 @@ if __name__ == "__main__":
     video_path = "C:\\Users\\Michal\\Videos\\magisterka\\baza_filmow\\chodnik\\1_nikon.MOV"
 
     depth_generator = Monodepth2Runner()
-    disparity_calculator = VDisparityCalculator(depth_generator.frame_shape, max_depth=20)
+    disparity_calculator = VDisparityCalculator(depth_generator.frame_shape, levels_of_depth=300, max_depth=20)
     file_name = path_utils.get_file_name_from_path(video_path)
     window = ImageWindowController()
     window.wait_keys_dict = {

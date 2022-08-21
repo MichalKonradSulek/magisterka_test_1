@@ -40,12 +40,12 @@ class ImageWindowController:
         else:
             cv2.waitKey(0)
 
-    def show_image(self, image):
+    def show_image(self, image, do_not_run_waitkey=False):
         if self.resize_factor_x_y is not None:
             target_size = (image.shape[1] * self.resize_factor_x_y[0], image.shape[0] * self.resize_factor_x_y[1])
             image_to_show = cv2.resize(image, target_size)
         else:
             image_to_show = image
         cv2.imshow(self.window_name, image_to_show)
-        if self.run_cv_waitkey:
+        if self.run_cv_waitkey and not do_not_run_waitkey:
             self._wait_for_key()

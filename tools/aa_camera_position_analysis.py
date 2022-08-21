@@ -11,6 +11,7 @@ from utilities.image_window_controller import ImageWindowController
 from monodepth2_runner import Monodepth2Runner
 import utilities.image_operations as img_utils
 import utilities.path_utils as path_utils
+import utilities.plot_utils as plot_utils
 
 
 column_plot = None
@@ -84,7 +85,7 @@ if __name__ == "__main__":
         image_to_show = np.copy(image)
         add_important_lines_to_image(image_to_show)
         depth_to_show = depth / 20
-        column_plot = img_utils.get_column_plot(depth[:, int(depth.shape[1] / 2)], min_val=0, max_val=30)
+        column_plot = plot_utils.get_column_plot(depth[:, int(depth.shape[1] / 2)], min_val=0, max_val=30)
 
         cv2.imshow("plot", column_plot)
         cv2.imshow("depth", depth_to_show)
