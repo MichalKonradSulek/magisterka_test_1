@@ -1,3 +1,8 @@
+"""
+Skrypt łączy trzy zdjęcia w jedno (zdjęcie x, x_depth oraz x_plotax). Wysokość zdjęcia x determinuje wysokość całości.
+Wynik zapisywany jest z końcówką _comb i rozszerzeniem .png.
+"""
+
 import os
 import cv2
 import utilities.image_operations as img_utils

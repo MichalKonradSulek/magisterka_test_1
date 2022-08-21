@@ -1,3 +1,9 @@
+"""
+Skrypt w danej lokalizacji wszystkie pliki z końcówką _comb. Następnie, pliki z tego samego ujęcia łączone są w jeden
+obraz. Jego rozmiar zmniejszany jest 2x wzdłuż każdej osi.
+Pliki traktowane są jako pochodzące z tego samego ujęcia, jeśli ich nazwa, po obcięciu suffixu _n_comb jest taka sama.
+"""
+
 import os
 import cv2
 import numpy as np

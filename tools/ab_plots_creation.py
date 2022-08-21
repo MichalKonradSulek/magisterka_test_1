@@ -63,6 +63,6 @@ if __name__ == '__main__':
         name_and_extension = os.path.splitext(file)
         if name_and_extension[0].endswith('plot'):
             plot = cv2.imread(os.path.join(dir_path, file))
-            plot_with_axes = add_axes(plot, 0, 20, 0, 192, "depth [m]", "h [pix]", 85, 5, 200)
+            plot_with_axes = add_axes(plot, 0, 30, 0, 192, "depth [m]", "h [pix]", 85, 5, 200)
             new_path = os.path.join(dir_path, name_and_extension[0] + 'ax' + name_and_extension[1])
             cv2.imwrite(new_path, plot_with_axes)
