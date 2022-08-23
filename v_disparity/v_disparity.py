@@ -3,7 +3,7 @@ import cv2
 
 
 class VDisparityCalculator:
-    def __init__(self, frame_shape, levels_of_depth=100, max_depth=100):
+    def __init__(self, frame_shape, levels_of_depth=100, max_depth=100.):
         self.frame_shape = frame_shape
         self.levels_of_depth = levels_of_depth
         self.max_depth = max_depth

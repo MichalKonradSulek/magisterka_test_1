@@ -15,7 +15,7 @@ import utilities.plot_utils as plot_utils
 selected_x = None
 selected_y = None
 plot = None
-mode = 'v'
+mode = 'h'
 
 
 def save_plot():
@@ -80,7 +80,7 @@ def change_mode_to_h():
 
 
 if __name__ == "__main__":
-    image_path = "C:\\Users\\Michal\\Pictures\\magisterka\\pusty_chodnik\\1_nikon_45.png"
+    image_path = "C:\\Users\\Michal\\Pictures\\magisterka\\pusty_chodnik\\2_nikon_19.png"
 
     depth_generator = Monodepth2Runner()
     window = ImageWindowController()
