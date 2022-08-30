@@ -6,7 +6,7 @@ from monodepth2_runner import Monodepth2Runner
 from u_disparity.u_disparity import UDisparityCalculator
 from v_disparity.v_disparity import VDisparityCalculator
 from ground_detection.curve_from_lowest import CurveFromLowest
-from ground_detection.curve_from_max import CurveFromMax
+from ground_detection.curve_from_max_column import CurveFromMaxColumn
 from ground_detection.ground_points_qualifier import _create_y_index_pows_column
 from ground_detection.ground_points_qualifier import GroundPointsQualifier
 from utilities.image_window_controller import ImageWindowController

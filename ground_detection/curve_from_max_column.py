@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class CurveFromMax:
+class CurveFromMaxColumn:
     def __init__(self, threshold, v_disparity_shape, max_depth, curve_degree):
         self.bucket_size = max_depth / v_disparity_shape[1]
         self.curve_degree = curve_degree

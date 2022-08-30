@@ -5,7 +5,7 @@ import numpy as np
 from monodepth2_runner import Monodepth2Runner
 from v_disparity.v_disparity import VDisparityCalculator
 from ground_detection.curve_from_lowest import CurveFromLowest
-from ground_detection.curve_from_max import CurveFromMax
+from ground_detection.curve_from_max_columnpy import CurveFromMax
 from ground_detection.ground_points_qualifier import _create_y_index_pows_column
 from ground_detection.ground_points_qualifier import GroundPointsQualifier
 from utilities.image_window_controller import ImageWindowController
@@ -52,7 +52,10 @@ if __name__ == '__main__':
         resized_bgr_image = cv2.resize(bgr_image, (depth_generator.frame_shape[1], depth_generator.frame_shape[0]))
         depth = depth_generator.generate_depth(cv2.cvtColor(resized_bgr_image, cv2.COLOR_BGR2RGB)).squeeze()
         v_disparity = disparity_calculator.create_v_disparity(depth)
-        curve = curve_generator.get_curve(v_disparity)
+        half_height = int(v_disparity.shape[0] / 2)
+        v_disparity_for_curve = np.zeros(v_disparity.shape)
+        v_disparity_for_curve[half_height:, :] = v_disparity[half_height:, :]
+        curve = curve_generator.get_curve(v_disparity_for_curve)
         ground_pixels = ground_points_qualifier.get_floor_pixels(depth, curve)
         far_objects = depth > max_depth
         resized_bgr_image[:, :, 0][ground_pixels] = 255
