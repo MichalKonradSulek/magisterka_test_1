@@ -5,7 +5,7 @@ import cv2
 from monodepth2_runner import Monodepth2Runner
 from v_disparity.v_disparity import VDisparityCalculator
 from ground_detection.curve_from_lowest import CurveFromLowest
-from ground_detection.curve_from_max import CurveFromMax
+from ground_detection.curve_from_max_column import CurveFromMaxColumn
 from ground_detection.ground_points_qualifier import _create_y_index_pows_column
 from ground_detection.ground_points_qualifier import GroundPointsQualifier
 from utilities.image_window_controller import ImageWindowController
@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     depth_generator = Monodepth2Runner()
     disparity_calculator = VDisparityCalculator(depth_generator.frame_shape, v_disparity_levels, max_depth)
-    curve_generator = CurveFromMax(0.1, (depth_generator.frame_shape[0], v_disparity_levels), max_depth, curve_degree)
+    curve_generator = CurveFromMaxColumn(0.1, (depth_generator.frame_shape[0], v_disparity_levels), max_depth, curve_degree)
     ground_points_qualifier = GroundPointsQualifier(depth_generator.frame_shape, 0.7, curve_degree)
     result_window = ImageWindowController(resize_factor_x_y=(2, 2))
 

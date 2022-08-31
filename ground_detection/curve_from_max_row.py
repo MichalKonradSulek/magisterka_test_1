@@ -25,7 +25,7 @@ class CurveFromMaxRow:
             if v_disparity[y, unfiltered_x[y]] > self.threshold:
                 points_x.append(unfiltered_x[y])
                 points_y.append(y)
-        return points_x, points_y
+        return points_y, points_x
 
     def get_curve(self, v_disparity):
         points_h, points_d = self.extract_points(v_disparity)

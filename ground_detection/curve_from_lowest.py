@@ -29,7 +29,7 @@ class CurveFromLowest:
                     points_x.append(x)
                     points_y.append(y)
                     break
-        return points_x, points_y
+        return points_y, points_x
 
     def get_curve(self, v_disparity):
         points_h, points_d = self.extract_points(v_disparity)
