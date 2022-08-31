@@ -1,13 +1,7 @@
-import numpy as np
+from ground_detection.abstract_curve_generator import AbstractCurveGenerator
 
 
-class CurveFromLowest:
-    def __init__(self, threshold, v_disparity_shape, max_depth, curve_degree,
-                 depth_multiplier_for_curve_generation=None):
-        self.threshold = threshold
-        self.bucket_size = max_depth / v_disparity_shape[1]
-        self.curve_degree = curve_degree
-        self.depth_multiplier_for_curve_generation = depth_multiplier_for_curve_generation
+class CurveFromLowest(AbstractCurveGenerator):
 
     def extract_points(self, v_disparity):
         points_d = []
@@ -30,12 +24,3 @@ class CurveFromLowest:
                     points_y.append(y)
                     break
         return points_y, points_x
-
-    def get_curve(self, v_disparity):
-        points_h, points_d = self.extract_points(v_disparity)
-        if self.depth_multiplier_for_curve_generation is None:
-            return np.polyfit(points_h, points_d, deg=self.curve_degree)
-        else:
-            modified_d = [d*self.depth_multiplier_for_curve_generation for d in points_d]
-            curve = np.polyfit(points_h, modified_d, deg=self.curve_degree)
-            return [d/self.depth_multiplier_for_curve_generation for d in curve]
