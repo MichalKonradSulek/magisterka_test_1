@@ -70,31 +70,31 @@ if __name__ == '__main__':
     paths_to_pictures = get_paths_to_all_valid_pictures(dir_path)
 
     # Ta część służy do generowania wyniku w postaci obrazka oraz dostarcza informację o dokładności każdego rozwiązania
-    for path in paths_to_pictures:
-        bgr_image = cv2.imread(path)
-        resized_bgr_image = cv2.resize(bgr_image, (depth_generator.frame_shape[1], depth_generator.frame_shape[0]))
-        depth = depth_generator.generate_depth(cv2.cvtColor(resized_bgr_image, cv2.COLOR_BGR2RGB)).squeeze()
-        v_disparity = disparity_calculator.create_v_disparity(depth)
-        v_d_1, residuals_1 = prepare_result_for_curve_generator(v_disparity, curve_generator_1)
-        v_d_2, residuals_2 = prepare_result_for_curve_generator(v_disparity, curve_generator_2)
-        v_d_3, residuals_3 = prepare_result_for_curve_generator(v_disparity, curve_generator_3)
-        v_d_4, residuals_4 = prepare_result_for_curve_generator(v_disparity, curve_generator_4)
-        original_new_size = (int(v_d_1.shape[0] * bgr_image.shape[1] / bgr_image.shape[0]), v_d_1.shape[0])
-        resized_original = cv2.resize(bgr_image, original_new_size)
-        white_bar = np.ones((v_d_1.shape[0], 2, 3), dtype='uint8') * 255
-        picture_to_show = np.concatenate((resized_original, white_bar,  v_d_1,  white_bar, v_d_2, white_bar, v_d_3, white_bar, v_d_4), axis=1)
-
-        print(os.path.basename(path), residuals_1, residuals_2, residuals_3, residuals_4, sep='\t')
-        base_and_extension = os.path.splitext(path)
-        cv2.imwrite(base_and_extension[0] + '_result' + base_and_extension[1], picture_to_show)
-
-        cv2.imshow("result", picture_to_show)
-        cv2.waitKey(0)
+    # for path in paths_to_pictures:
+    #     bgr_image = cv2.imread(path)
+    #     resized_bgr_image = cv2.resize(bgr_image, (depth_generator.frame_shape[1], depth_generator.frame_shape[0]))
+    #     depth = depth_generator.generate_depth(cv2.cvtColor(resized_bgr_image, cv2.COLOR_BGR2RGB)).squeeze()
+    #     v_disparity = disparity_calculator.create_v_disparity(depth)
+    #     v_d_1, residuals_1 = prepare_result_for_curve_generator(v_disparity, curve_generator_1)
+    #     v_d_2, residuals_2 = prepare_result_for_curve_generator(v_disparity, curve_generator_2)
+    #     v_d_3, residuals_3 = prepare_result_for_curve_generator(v_disparity, curve_generator_3)
+    #     v_d_4, residuals_4 = prepare_result_for_curve_generator(v_disparity, curve_generator_4)
+    #     original_new_size = (int(v_d_1.shape[0] * bgr_image.shape[1] / bgr_image.shape[0]), v_d_1.shape[0])
+    #     resized_original = cv2.resize(bgr_image, original_new_size)
+    #     white_bar = np.ones((v_d_1.shape[0], 2, 3), dtype='uint8') * 255
+    #     picture_to_show = np.concatenate((resized_original, white_bar,  v_d_1,  white_bar, v_d_2, white_bar, v_d_3, white_bar, v_d_4), axis=1)
+    #
+    #     print(os.path.basename(path), residuals_1, residuals_2, residuals_3, residuals_4, sep='\t')
+    #     base_and_extension = os.path.splitext(path)
+    #     cv2.imwrite(base_and_extension[0] + '_result' + base_and_extension[1], picture_to_show)
+    #
+    #     cv2.imshow("result", picture_to_show)
+    #     cv2.waitKey(0)
 
     # Ta część służy do badania czasu wykonywania operacji
     array_of_generators = [curve_generator_1, curve_generator_2, curve_generator_3, curve_generator_4]
-    run_test_n_times = 10
-    run_each_n_times = 100
+    run_test_n_times = 1
+    run_each_n_times = 1000
     result_table = np.zeros((run_test_n_times, len(array_of_generators), len(paths_to_pictures)))
     for test_i in range(run_test_n_times):
         print("test:", test_i)

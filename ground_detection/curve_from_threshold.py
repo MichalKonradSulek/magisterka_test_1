@@ -6,9 +6,7 @@ class CurveFromThreshold(AbstractCurveGenerator):
 
     def extract_points(self, v_disparity):
         indexes_of_points = np.where(v_disparity > self.threshold)
-        points_d = []
-        for x in indexes_of_points[1]:
-            points_d.append((x + 0.5) * self.bucket_size)
+        points_d = (indexes_of_points[1].astype('float') + 0.5) * self.bucket_size
         return indexes_of_points[0], points_d
 
     def extract_points_indexes(self, v_disparity):

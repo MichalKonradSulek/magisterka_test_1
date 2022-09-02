@@ -10,7 +10,7 @@ class CurveFromMaxColumn(AbstractCurveGenerator):
         unfiltered_h = np.argmax(v_disparity, axis=0)
         for x in range(v_disparity.shape[1]):
             if v_disparity[unfiltered_h[x], x] > self.threshold:
-                points_d.append((x + 0.5) * self.bucket_size)
+                points_d.append(self.d_index_row[x])
                 points_h.append(unfiltered_h[x])
         return points_h, points_d
 
