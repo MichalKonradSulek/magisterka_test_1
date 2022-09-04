@@ -12,10 +12,11 @@ def _create_y_index_pows_column(height, degree):
 
 
 class GroundPointsQualifier:
-    def __init__(self, frame_shape, tolerance, curve_degree):
+    def __init__(self, frame_shape, tolerance, curve_degree, max_depth=None):
         self.frame_shape = frame_shape
         self.y_index_pows_column = _create_y_index_pows_column(frame_shape[0], curve_degree)
         self.tolerance = tolerance
+        self.max_depth = max_depth
 
     def _create_curve_column(self, curve):
         coefficients_multiplied_by_y = self.y_index_pows_column * curve
@@ -23,8 +24,12 @@ class GroundPointsQualifier:
 
     def get_floor_pixels(self, depth_frame, curve):
         curve_array = np.tile(self._create_curve_column(curve).reshape((-1, 1)), (1, self.frame_shape[1]))
-        return np.logical_and(curve_array - self.tolerance <= depth_frame,
-                              depth_frame <= curve_array + self.tolerance)
+        pixels_in_tolerance = np.logical_and(curve_array - self.tolerance <= depth_frame,
+                                  depth_frame <= curve_array + self.tolerance)
+        if self.max_depth is None:
+            return pixels_in_tolerance
+        else:
+            return np.logical_and(pixels_in_tolerance, depth_frame <= self.max_depth)
 
 
 if __name__ == '__main__':
