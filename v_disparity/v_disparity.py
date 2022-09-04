@@ -8,6 +8,9 @@ class VDisparityCalculator:
         self.levels_of_depth = levels_of_depth
         self.max_depth = max_depth
 
+    def get_disparity_shape(self):
+        return self.frame_shape[0], self.levels_of_depth
+
     def create_v_disparity(self, depth_frame):
         result = np.zeros((self.frame_shape[0], self.levels_of_depth))
         for i in range(self.frame_shape[0]):
