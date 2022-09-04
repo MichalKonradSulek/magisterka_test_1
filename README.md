@@ -1,4 +1,4 @@
-#Algorytm do analizy przeszkód na podstawie obrazu z kamery RGB
+# Algorytm do analizy przeszkód na podstawie obrazu z kamery RGB
 
 Do działania algorytmu wymagana jest sieć monodepth2. Pliki projektu sieci znajdują się pod adresem https://github.com/nianticlabs/monodepth2.git. Należy je umieścić w katalogu monodepth2 i ewentualnie poprawić nazwy paczek w importach.
 
