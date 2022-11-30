@@ -20,3 +20,8 @@ def paint_column_green(mat, x):
 
 def join_pictures(img1, img2, img3):
     return np.concatenate((img1, img2, img3), axis=1)
+
+
+def crop_wide_frame_to_square(frame):
+    left_width_to_crop = int((frame.shape[1] - frame.shape[0]) / 2)
+    return frame[:, left_width_to_crop:(left_width_to_crop + frame.shape[0]), ...]
