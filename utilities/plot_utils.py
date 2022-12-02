@@ -29,19 +29,25 @@ def get_column_plot(depth_column, min_val=None, max_val=None, bg_color=(255, 255
     return bg
 
 
-def get_row_plot(depth_row, min_val=None, max_val=None, bg_color=(255, 255, 255), plot_color=(255, 0, 0),
-                 plot_size_x_y=(800, 600), line_thickness=1):
+def append_row_plot(plot, depth_row, min_val=None, max_val=None, plot_color=(255, 0, 0), line_thickness=1):
+    plot_size_x_y = (plot.shape[1], plot.shape[0])
     if min_val is None:
         min_val = depth_row.min()
     if max_val is None:
         max_val = depth_row.max()
-    bg = _prepare_background(plot_size_x_y, bg_color)
     for i in range(len(depth_row) - 1):
         x1 = int(_scale(0, len(depth_row) - 1, plot_size_x_y[0], i))
         y1 = plot_size_x_y[1] - int(_scale(min_val, max_val, plot_size_x_y[1], depth_row[i]))
         x2 = int(_scale(0, len(depth_row) - 1, plot_size_x_y[0], i + 1))
         y2 = plot_size_x_y[1] - int(_scale(min_val, max_val, plot_size_x_y[1], depth_row[i + 1]))
-        cv2.line(bg, (x1, y1), (x2, y2), color=plot_color, thickness=line_thickness)
+        cv2.line(plot, (x1, y1), (x2, y2), color=plot_color, thickness=line_thickness)
+
+
+def get_row_plot(depth_row, min_val=None, max_val=None, bg_color=(255, 255, 255), plot_color=(255, 0, 0),
+                 plot_size_x_y=(800, 600), line_thickness=1):
+    bg = _prepare_background(plot_size_x_y, bg_color)
+    append_row_plot(bg, depth_row=depth_row, min_val=min_val, max_val=max_val, plot_color=plot_color,
+                           line_thickness=line_thickness)
     return bg
 
 
@@ -54,7 +60,7 @@ def detect_bg_color(img):
 
 
 def extend_image(img, color, left, down, up=0, right=0):
-    extended_layer = np.ones((img.shape[0] + down + up, img.shape[1] + left + right))
+    extended_layer = np.ones((img.shape[0] + down + up, img.shape[1] + left + right), dtype="uint8")
     extended_img = np.dstack((extended_layer * color[0], extended_layer * color[1], extended_layer * color[2]))
     extended_img[up:(img.shape[0] + up), left:(img.shape[1] + left), :] = img
     return extended_img
@@ -78,13 +84,13 @@ def add_axes(plot_img, x_min_val, x_max_val, y_min_val, y_max_val, x_label, y_la
 
     cv2.line(extended_plot, (0, height - th_down), (width, height - th_down), axis_color)
     cv2.line(extended_plot, (th_left, 0), (th_left, height), axis_color)
-    for w in range(mark_x, x_max_val, mark_x):
+    for w in range(int(mark_x), int(x_max_val), int(mark_x)):
         w_pix = int(plot_img.shape[1] * (w - x_min_val) / (x_max_val - x_min_val) + th_left)
         cv2.line(extended_plot, (w_pix, height - th_down), (w_pix, height - th_down + mark_length), axis_color)
         cv2.putText(extended_plot, str(w), (w_pix + 2, height - th_down + 15), cv2.FONT_HERSHEY_PLAIN, 1, axis_color)
     cv2.putText(extended_plot, x_label, (width - x_label_length, height - th_down + 15),
                 cv2.FONT_HERSHEY_PLAIN, 1, axis_color)
-    for h in range(mark_y, y_max_val, mark_y):
+    for h in range(int(mark_y), int(y_max_val), int(mark_y)):
         h_pix = height - th_down - int(plot_img.shape[0] * (h - y_min_val) / (y_max_val - y_min_val))
         cv2.line(extended_plot, (th_left - mark_length, h_pix), (th_left, h_pix), axis_color)
         cv2.putText(extended_plot, str(h), (th_left - text_width(str(h)) - 2, h_pix - 2), cv2.FONT_HERSHEY_PLAIN, 1,
@@ -107,7 +113,7 @@ def get_column_plot_with_axes(depth_column, x_label, x_label_length, min_val=Non
                     mark_y=2*len(depth_column))
 
 
-def get_row_plot_with_axes(depth_row, y_label, min_val=None, max_val=None, bg_color=(255, 255, 255),
+def get_row_plot_with_axes(depth_row, y_label="", min_val=None, max_val=None, bg_color=(255, 255, 255),
                            plot_color=(255, 0, 0), plot_size_x_y=(800, 600), line_thickness=1, mark_y=10):
     if min_val is None:
         min_val = depth_row.min()
@@ -117,4 +123,16 @@ def get_row_plot_with_axes(depth_row, y_label, min_val=None, max_val=None, bg_co
                         plot_size_x_y=plot_size_x_y, line_thickness=line_thickness)
     return add_axes(plot, x_min_val=0, x_max_val=len(depth_row), y_min_val=min_val, y_max_val=max_val,
                     x_label="w [pix]", y_label=y_label, x_label_length=65, mark_x=2*len(depth_row),
-                    mark_y=5)
+                    mark_y=mark_y)
+
+
+def append_row_plot_with_axes(plot_with_axes, depth_row, min_val=None, max_val=None, plot_color=(255, 0, 0),
+                              plot_size_x_y=(800, 600), line_thickness=1):
+    if min_val is None:
+        min_val = depth_row.min()
+    if max_val is None:
+        max_val = depth_row.max()
+    plot = plot_with_axes[0:plot_size_x_y[1], (plot_with_axes.shape[1] - plot_size_x_y[0]):, ...]
+    append_row_plot(plot, depth_row, min_val=min_val, max_val=max_val, plot_color=plot_color,
+                    line_thickness=line_thickness)
+    plot_with_axes[0:plot_size_x_y[1], (plot_with_axes.shape[1] - plot_size_x_y[0]):, ...] = plot
